@@ -1,0 +1,4 @@
+INFO:root:SUCCESS: read dataframe.
+INFO:root:SUCCESS: saved EDA plots to the images folder.
+INFO:root:SUCCESS: Encoded categorical columns and created new columns with proportion of churn.
+INFO:root:SUCCESS: split data into train and test

@@ -63,27 +63,42 @@ def perform_eda(dataframe):
         plt.close()
 
     # Analyze Numeric features
+    num_columns = ['Customer_Age', 'Dependent_count', 'Months_on_book',
+             'Total_Relationship_Count', 'Months_Inactive_12_mon',
+             'Contacts_Count_12_mon', 'Credit_Limit', 'Total_Revolving_Bal',
+             'Avg_Open_To_Buy', 'Total_Amt_Chng_Q4_Q1', 'Total_Trans_Amt',
+             'Total_Trans_Ct', 'Total_Ct_Chng_Q4_Q1', 'Avg_Utilization_Ratio',
+             'Churn']
+
+    dataframe_eda_num = dataframe[num_columns] 
+
     plt.figure(figsize=(10, 5))
-    dataframe['Customer_Age'].plot(kind='hist', title='Distribution of Customer Age')
+    dataframe_eda_num['Churn'].plot(kind='hist', title='Distribution Churn')
+    plt.savefig(os.path.join("./images/eda", 'Churn_hist.png'), bbox_inches='tight')
+    plt.show()
+    plt.close()
+
+    plt.figure(figsize=(10, 5))
+    dataframe_eda_num['Customer_Age'].plot(kind='hist', title='Distribution of Customer Age')
     plt.savefig(os.path.join("./images/eda", 'Customer_Age.png'), bbox_inches='tight')
     plt.show()
     plt.close()
 
     plt.figure(figsize=(10, 5))
-    sns.histplot(dataframe['Total_Trans_Ct'], stat='density', kde=True)
+    sns.histplot(dataframe_eda_num['Total_Trans_Ct'], stat='density', kde=True)
     plt.savefig(os.path.join("./images/eda", 'Total_Trans_Ct.png'), bbox_inches='tight')
     plt.show()
     plt.close()
 
     # plot correlation matrix
     plt.figure(figsize=(15, 7))
-    sns.heatmap(dataframe.corr(), annot=False, cmap='Dark2_r', linewidths=2)
+    sns.heatmap(dataframe_eda_num.corr(), annot=False, cmap='Dark2_r', linewidths=2)
     plt.savefig(os.path.join("./images/eda", 'correlation_matrix.png'), bbox_inches='tight')
     plt.show()
     plt.close()
 
     plt.figure(figsize=(15, 7))
-    dataframe.plot(x='Total_Trans_Amt', y='Total_Trans_Ct', kind='scatter', title='Correlation analysis between 2 features')
+    dataframe_eda_num.plot(x='Total_Trans_Amt', y='Total_Trans_Ct', kind='scatter', title='Correlation analysis between 2 features')
     plt.savefig(os.path.join("./images/eda", 'Total_Trans_Amt_vs_Total_Trans_Ct.png'), bbox_inches='tight')
     plt.show()
     plt.close()
@@ -102,6 +117,7 @@ def encoder_helper(dataframe, category_lst, response='Churn'):
     output:
         dataframe: pandas dataframe with new columns for encoded categorical features
     '''
+
     for category in category_lst:
         category_means = dataframe.groupby(category).mean()[response]
         new_feature = category + '_' + response
@@ -125,10 +141,17 @@ def perform_feature_engineering(dataframe, response='Churn'):
         y_train: y training data
         y_test: y testing data
     '''
-    cat_columns = dataframe.select_dtypes(include='object').columns.tolist()
+    cat_columns = ['Gender', 'Education_Level', 'Marital_Status', 'Income_Category', 'Card_Category']
     dataframe = encoder_helper(dataframe, cat_columns, response='Churn')
     y = dataframe[response]
     X = dataframe.drop(response, axis=1)
+    X = X['Customer_Age', 'Dependent_count', 'Months_on_book',
+             'Total_Relationship_Count', 'Months_Inactive_12_mon',
+             'Contacts_Count_12_mon', 'Credit_Limit', 'Total_Revolving_Bal',
+             'Avg_Open_To_Buy', 'Total_Amt_Chng_Q4_Q1', 'Total_Trans_Amt',
+             'Total_Trans_Ct', 'Total_Ct_Chng_Q4_Q1', 'Avg_Utilization_Ratio',
+             'Gender_Churn', 'Education_Level_Churn', 'Marital_Status_Churn', 
+             'Income_Category_Churn', 'Card_Category_Churn']
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
     return X_train, X_test, y_train, y_test
